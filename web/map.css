@@ -1,0 +1,119 @@
+/* s-core-map — stile dei pezzi del motore mappa: caratteri delle etichette, riquadri MapLibre,
+   selettore Strada/Satellite, zoom e bussola, scelta tra elementi vicini (elenco/raggiera),
+   logo Google. L'app imposta i colori con le sue variabili (--surface, --surface-2, --border,
+   --text, --muted, --accent, --font, --mono); qui ci sono i valori di ripiego. */
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("/vendor/fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 500; font-style: normal; font-display: swap; src: url("/vendor/fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("/vendor/fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url("/vendor/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url("/vendor/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); }
+
+.maplibregl-map { --mc-surface: var(--surface, #fff); --mc-surface2: var(--surface-2, #f1f3f6); --mc-border: var(--border, #e5e7eb);
+  --mc-text: var(--text, #111827); --mc-muted: var(--muted, #6b7280); --mc-acc: var(--accent, #2563eb);
+  --mc-font: var(--font, "IBM Plex Sans", system-ui, sans-serif); --mc-mono: var(--mono, "IBM Plex Mono", ui-monospace, monospace); }
+/* tutto ciò che il motore mette sopra la mappa condivide le stesse variabili */
+.pick-sheet, .spider, .layers-panel, .g-logo { --mc-surface: var(--surface, #fff); --mc-surface2: var(--surface-2, #f1f3f6); --mc-border: var(--border, #e5e7eb);
+  --mc-text: var(--text, #111827); --mc-muted: var(--muted, #6b7280); --mc-acc: var(--accent, #2563eb); --mc-font: var(--font, "IBM Plex Sans", system-ui, sans-serif); }
+
+/* mappa: cursori di sistema (freccia; mano solo su ciò che si clicca) */
+.maplibregl-canvas-container.maplibregl-interactive, .maplibregl-canvas-container.maplibregl-interactive:active { cursor: default; }
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass { cursor: pointer; }
+
+/* riquadri (popup) */
+.maplibregl-popup-content { background: var(--mc-surface); color: var(--mc-text); border-radius: 8px; font: 12px/1.45 var(--mc-font); padding: 10px 12px; box-shadow: var(--shadow, 0 4px 16px rgb(0 0 0 / .2)); }
+.maplibregl-popup-tip { border-top-color: var(--mc-surface) !important; border-bottom-color: var(--mc-surface) !important; }
+.pop b { font-size: 13px; } .pop table { border-collapse: collapse; margin-top: 4px; } .pop td { padding: 1px 8px 1px 0; } .pop td:last-child { font-family: var(--mc-mono); }
+
+/* zoom e bussola */
+.maplibregl-ctrl-group { background: var(--mc-surface); box-shadow: 0 0 0 2px rgb(0 0 0 / .1); }
+.maplibregl-ctrl-group button { background: transparent !important; }
+:root[data-theme="dark"] .maplibregl-ctrl-group { background: #1f232b; box-shadow: 0 0 0 1px #2a2f39; }
+:root[data-theme="dark"] .maplibregl-ctrl-group button + button { border-top-color: #2a2f39; }
+:root[data-theme="dark"] .maplibregl-ctrl-group button:not(:disabled):hover { background: #2a2f39 !important; }
+:root[data-theme="dark"] .maplibregl-ctrl-group .maplibregl-ctrl-icon { filter: invert(1) brightness(1.6); }
+/* bussola: nord rosso e sud nero (tema chiaro) o bianco (tema scuro) */
+.maplibregl-ctrl-group .maplibregl-ctrl-compass .maplibregl-ctrl-icon { transform-origin: center; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath fill='%23e11d48' d='m10.5 14 4-8 4 8z'/%3E%3Cpath fill='%23111827' d='m10.5 16 4 8 4-8z'/%3E%3C/svg%3E") !important; filter: none !important; }
+:root[data-theme="dark"] .maplibregl-ctrl-group .maplibregl-ctrl-compass .maplibregl-ctrl-icon { background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath fill='%23e11d48' d='m10.5 14 4-8 4 8z'/%3E%3Cpath fill='%23f3f4f6' d='m10.5 16 4 8 4-8z'/%3E%3C/svg%3E") !important; filter: none !important; }
+/* telefono: bussola solo se la mappa è ruotata, piena, con uscita "a implosione" */
+@media (max-width: 760px) {
+  .maplibregl-map:not(.rotated) .maplibregl-ctrl-group:has(.maplibregl-ctrl-compass) { display: none; }
+  .maplibregl-ctrl-group:has(.maplibregl-ctrl-compass) { border-radius: 12px; overflow: hidden; }
+  .maplibregl-ctrl-group .maplibregl-ctrl-compass { width: 44px; height: 44px; }
+  .maplibregl-map.rotated .maplibregl-ctrl-group:has(.maplibregl-ctrl-compass) { animation: compassIn .18s cubic-bezier(.2,1.4,.4,1) both; }
+  .maplibregl-map.compass-out .maplibregl-ctrl-group:has(.maplibregl-ctrl-compass) { animation: compassOut .45s cubic-bezier(.5,-0.6,.7,.4) forwards; }
+  .maplibregl-ctrl-group:has(.maplibregl-ctrl-fullscreen) { display: none !important; }
+  .maplibregl-ctrl-scale { display: none; }
+}
+@keyframes compassIn { from { transform: scale(.4); } to { transform: scale(1); } }
+@keyframes compassOut { 0% { transform: scale(1); } 35% { transform: scale(1.12); } 100% { transform: scale(0); } }
+
+/* selettore Strada / Satellite + tasto "Cosa vedere" */
+.basemap-ctrl { position: relative; display: flex; background: var(--mc-surface); border-radius: 8px; box-shadow: 0 0 0 2px rgb(0 0 0 / .1); }
+.basemap-ctrl button { border: 0; background: var(--mc-surface); color: var(--mc-text); font: 500 12px var(--mc-font); padding: 7px 12px; cursor: pointer; }
+.basemap-ctrl button + button { border-left: 1px solid var(--mc-border); }
+.basemap-ctrl button[aria-pressed="true"], .basemap-ctrl button[aria-pressed="true"]:hover { background: var(--mc-acc); color: #fff; }
+.basemap-ctrl button:hover:not([aria-pressed="true"]) { background: var(--mc-surface2); }
+.basemap-ctrl > button:first-child { border-radius: 8px 0 0 8px; } .basemap-ctrl > button:last-child { border-radius: 0 8px 8px 0; }
+.basemap-ctrl .bm-layers { display: grid; place-items: center; padding: 6px 9px; }
+.basemap-ctrl .bm-layers svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linejoin: round; }
+:root[data-theme="dark"] .basemap-ctrl, :root[data-theme="dark"] .basemap-ctrl button { background: #1f232b; color: #e5e7eb; }
+:root[data-theme="dark"] .basemap-ctrl { box-shadow: 0 0 0 1px #2a2f39; }
+:root[data-theme="dark"] .basemap-ctrl button + button { border-left-color: #2a2f39; }
+:root[data-theme="dark"] .basemap-ctrl button[aria-pressed="true"] { background: var(--mc-acc); color: #fff; }
+:root[data-theme="dark"] .basemap-ctrl button:hover:not([aria-pressed="true"]) { background: #2a2f39; }
+/* pannello delle spunte (lo riempie l'app) */
+.layers-panel { position: absolute; top: calc(100% + 6px); left: 0; z-index: 6; min-width: 200px; padding: 6px; border-radius: 10px;
+  background: var(--mc-surface); color: var(--mc-text); border: 1px solid var(--mc-border); box-shadow: var(--shadow, 0 4px 16px rgb(0 0 0 / .2)); display: grid; }
+.layers-panel .lp-h { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: var(--mc-muted); padding: 4px 8px 6px; }
+.layers-panel .lp-row { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 7px; font: 13px var(--mc-font); cursor: pointer; }
+.layers-panel .lp-row:hover { background: var(--mc-surface2); }
+.layers-panel input { margin: 0; width: 16px; height: 16px; }
+.maplibregl-ctrl-top-right .basemap-ctrl { z-index: 5; }
+.maplibregl-ctrl-top-right .layers-panel { left: auto; right: 0; z-index: 50; }
+@media (min-width: 761px) {
+  .maplibregl-ctrl-top-right .basemap-ctrl { height: 38px; box-sizing: border-box; margin-top: 10px; }
+  .maplibregl-ctrl-top-right .basemap-ctrl button { height: 100%; }
+}
+
+/* scelta tra elementi vicini: elenco (riquadro su PC, pannello in alto sul telefono) */
+.pick-pop { display: grid; gap: 4px; min-width: 200px; max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain; }
+.pick-pop .pk-h { position: sticky; top: 0; z-index: 1; background: var(--mc-surface); padding: 2px 0; font-size: 12px; margin-bottom: 2px; }
+.pk-row { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pk-row:hover { background: var(--mc-surface2); }
+.pk-t { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.pk-t b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pk-t .muted { font-size: 11.5px; color: var(--mc-muted); }
+.pk-sq { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+.pk-peer { width: 15px; height: 15px; border-radius: 50%; background: #059669; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #05966955; flex: none; }
+.pk-peer.off { filter: grayscale(1); opacity: .7; }
+.pk-me { background: #1d4ed8; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #1d4ed855; }
+.pk-poi { width: 13px; height: 13px; border-radius: 50% 50% 50% 0 !important; transform: rotate(-45deg); border: 2px solid #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / .25); flex: none; }
+.pick-sheet { position: absolute; z-index: 7; display: flex; flex-direction: column; border-radius: 14px; overflow: hidden;
+  background: var(--mc-surface); color: var(--mc-text); border: 1px solid var(--mc-border); box-shadow: 0 6px 24px rgb(0 0 0 / .18);
+  top: 116px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 380px; max-height: min(56vh, calc(100% - 116px - var(--sheet, 0px) - 84px)); }
+.pick-sheet .pk-h { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 6px; font-size: 13.5px; }
+.pick-sheet .pk-x { border: 0; background: var(--mc-surface2); color: var(--mc-muted); width: 28px; height: 28px; border-radius: 50%; font-size: 12px; cursor: pointer; }
+.pick-sheet .pk-list { overflow-y: auto; overscroll-behavior: contain; padding: 0 6px 8px; display: grid; gap: 2px; }
+.pick-sheet .pk-row { width: 100%; padding: 10px 8px; }
+
+/* raggiera: elementi di un gruppo in cerchio attorno a un centro chiaro, nomi verso l'esterno */
+.spider { position: relative; width: 0; height: 0; z-index: 6; }
+.spider .sp-back { position: absolute; left: 0; top: 0; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: auto;
+  background: color-mix(in srgb, var(--mc-surface) 42%, transparent); box-shadow: 0 4px 18px rgb(0 0 0 / .12); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.spider .sp-lines { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); pointer-events: none; overflow: visible; }
+.spider .sp-lines line { stroke: var(--mc-muted); stroke-width: 1.5; stroke-dasharray: 3 3; opacity: .8; }
+.spider .sp-center { position: absolute; left: 0; top: 0; width: 16px; height: 16px; border-radius: 50%; transform: translate(-50%, -50%);
+  background: #fff; border: 3px solid var(--mc-acc); box-shadow: 0 1px 4px rgb(0 0 0 / .35); }
+.spider .sp-item { position: absolute; left: 0; top: 0; transform: translate(calc(var(--x) - 50%), calc(var(--y) - 14px));
+  display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none; padding: 0; cursor: pointer; animation: spIn .18s ease-out both; }
+@keyframes spIn { from { opacity: 0; scale: .6; } }
+.spider .sp-item.sp-up { flex-direction: column-reverse; transform: translate(calc(var(--x) - 50%), calc(var(--y) - 100% + 14px)); }
+.spider .sp-item.sp-right { flex-direction: row; gap: 5px; transform: translate(calc(var(--x) - 14px), calc(var(--y) - 50%)); }
+.spider .sp-item.sp-left { flex-direction: row-reverse; gap: 5px; transform: translate(calc(var(--x) - 100% + 14px), calc(var(--y) - 50%)); }
+.spider .sp-ic { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--mc-surface); box-shadow: 0 1px 5px rgb(0 0 0 / .35); }
+.spider .sp-l { max-width: 130px; padding: 2px 7px; border-radius: 6px; background: rgb(17 24 39 / .6); color: #fff; font: 600 11.5px var(--mc-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* logo Google (satellite di Google) */
+.g-logo { position: absolute; left: 10px; bottom: calc(var(--sheet, 0px) + 74px); z-index: 2; pointer-events: none;
+  font: 700 14px/1 "Product Sans", Arial, sans-serif; color: #fff; text-shadow: 0 0 2px rgb(0 0 0 / .8), 0 1px 3px rgb(0 0 0 / .6); letter-spacing: .2px; }
+@media (min-width: 761px) { .g-logo { bottom: 28px; } }
