@@ -43,7 +43,7 @@
 (function () {
 'use strict';
 
-const MapCore = { version: '0.1.0' };
+const MapCore = { version: '0.1.1' };
 
 function create(cfg) {
   const H = Object.assign({}, cfg.hooks || {});
@@ -505,6 +505,7 @@ function create(cfg) {
     else map.setStyle(STYLES.liberty, { diff: false });           // torno ai colori originali
   }
   new MutationObserver(() => syncMapTheme()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  syncMapTheme();   // tema già scuro all'apertura: la mappa notte si applica al caricamento dello stile
   // Mappa scura: la stessa mappa stradale (stesse etichette, cartelli e icone) ricolorata con una
   // palette notte. Regole per nome del livello dello stile OpenFreeMap "liberty".
   const NIGHT = {

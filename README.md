@@ -27,9 +27,9 @@ Router: `.merge(s_core_map::routes())` (rotte pubbliche `/map.js`, `/map.css`, `
 `index.html` (dopo il guscio s-core, prima di `app.js`):
 ```html
 <link rel="stylesheet" href="/vendor/maplibre-gl.css">
-<link rel="stylesheet" href="/map.css?v=0.1.0">
+<link rel="stylesheet" href="/map.css?v=0.1.1">
 <script src="/vendor/maplibre-gl.js"></script>
-<script src="/map.js?v=0.1.0"></script>
+<script src="/map.js?v=0.1.1"></script>
 ```
 `app.js`:
 ```js

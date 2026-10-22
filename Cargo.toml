@@ -1,6 +1,6 @@
 [package]
 name = "s-core-map"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Motore mappa comune delle app S* (SMap): MapLibre GL, fondali, icone, livelli, etichette, raggruppamento"
 publish = false
